@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Quản lý sản phẩm</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet"
+              href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+              crossorigin="anonymous">
+    </head>
+    <body>
+        <div class="container mt-5">
+            <h2 class="text-center mb-4">Quản lý sản phẩm</h2>
+
+            <!-- Form thêm sản phẩm -->
+            <form th:action="@{/products}" method="post">
+                <div class="form-row align-items-end">
+                    <div class="col">
+                        <label>Tên sản phẩm</label>
+                        <input type="text" class="form-control" name="name" placeholder="Nhập tên sản phẩm" required>
+                    </div>
+                    <div class="col">
+                        <label>Giá</label>
+                        <input type="number" class="form-control" name="price" step="0.01" placeholder="Nhập giá" required>
+                    </div>
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary">Thêm sản phẩm</button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Danh sách sản phẩm -->
+            <table class="table table-bordered table-hover mt-4">
+                <thead class="thead-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên</th>
+                        <th>Giá</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="product : ${products}">
+                        <td th:text="${product.id}">1</td>
+                        <td th:text="${product.name}">Tên sản phẩm</td>
+                        <td th:text="${product.price}">100.0</td>
+                        <td>
+                            <a th:href="@{'/products/edit/' + ${product.id}}" class="btn btn-warning btn-sm">Sửa</a>
+                            <a th:href="@{'/products/delete/' + ${product.id}}" class="btn btn-danger btn-sm"
+                               onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">Xóa</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Scripts -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+                crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+                crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+                crossorigin="anonymous"></script>
+    </body>
+</html>
