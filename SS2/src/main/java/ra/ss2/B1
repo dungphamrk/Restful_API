@@ -1,0 +1,11 @@
+Java Persistence API (JPA) là một đặc tả (specification) trong Java dùng để
+quản lý dữ liệu giữa ứng dụng Java và cơ sở dữ liệu quan hệ. JPA không phải
+là một framework cụ thể, mà là một tập hợp các quy tắc và giao diện mà các
+framework như Hibernate, EclipseLink hay OpenJPA thực hiện. Trong số đó,
+Hibernate là một trong những hiện thực phổ biến nhất của JPA. JPA cung cấp
+cách tiếp cận hướng đối tượng để thao tác với dữ liệu, giúp lập trình viên
+tránh viết nhiều câu lệnh SQL thuần và dễ dàng ánh xạ các class Java sang
+bảng trong cơ sở dữ liệu. JPA quan trọng trong phát triển ứng dụng Java vì
+nó chuẩn hóa cách làm việc với dữ liệu, tăng khả năng tái sử dụng, dễ bảo trì,
+và tách biệt logic xử lý với tầng lưu trữ dữ liệu. Nhờ đó, ứng dụng dễ dàng
+mở rộng và linh hoạt hơn khi thay đổi hệ quản trị cơ sở dữ liệu.
