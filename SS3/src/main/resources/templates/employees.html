@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Title</title>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+              crossorigin="anonymous">
+    </head>
+    <body>
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-12">
+                    <!-- Thông báo -->
+                    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span th:text="${success}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <span th:text="${error}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h3 class="mb-0">
+                                <i class="fas fa-users me-2"></i>Danh sách nhân viên
+                            </h3>
+                            <a href="/employees/add" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Thêm nhân viên
+                            </a>
+                        </div>
+
+                        <div class="card-body">
+                            <!-- Form tìm kiếm và sắp xếp -->
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <form method="get" th:action="@{/employees}">
+                                        <input type="hidden" name="page" th:value="${currentPage}">
+                                        <input type="hidden" name="size" th:value="${size}">
+                                        <input type="hidden" name="sortBy" th:value="${sortBy}">
+                                        <input type="hidden" name="sortDir" th:value="${sortDir}">
+
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="phoneNumber"
+                                                   th:value="${phoneNumber}" placeholder="Tìm kiếm theo số điện thoại...">
+                                            <button class="btn btn-outline-secondary" type="submit">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                            <a href="/employees" class="btn btn-outline-danger">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <form method="get" th:action="@{/employees}">
+                                        <input type="hidden" name="phoneNumber" th:value="${phoneNumber}">
+                                        <input type="hidden" name="page" value="0">
+
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <select name="sortBy" class="form-select" onchange="this.form.submit()">
+                                                    <option value="id" th:selected="${sortBy == 'id'}">ID</option>
+                                                    <option value="name" th:selected="${sortBy == 'name'}">Tên</option>
+                                                    <option value="email" th:selected="${sortBy == 'email'}">Email</option>
+                                                    <option value="salary" th:selected="${sortBy == 'salary'}">Lương</option>
+                                                    <option value="createdAt" th:selected="${sortBy == 'createdAt'}">Ngày tạo</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-6">
+                                                <select name="sortDir" class="form-select" onchange="this.form.submit()">
+                                                    <option value="asc" th:selected="${sortDir == 'asc'}">Tăng dần</option>
+                                                    <option value="desc" th:selected="${sortDir == 'desc'}">Giảm dần</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="size" th:value="${size}">
+                                    </form>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <form method="get" th:action="@{/employees}">
+                                            <input type="hidden" name="phoneNumber" th:value="${phoneNumber}">
+                                            <input type="hidden" name="sortBy" th:value="${sortBy}">
+                                            <input type="hidden" name="sortDir" th:value="${sortDir}">
+                                            <input type="hidden" name="page" value="0">
+
+                                            <div class="input-group">
+                                                <span class="input-group-text">Hiển thị:</span>
+                                                <select name="size" class="form-select" onchange="this.form.submit()">
+                                                    <option value="2" th:selected="${size == 2}">2</option>
+                                                    <option value="5" th:selected="${size == 5}">5</option>
+                                                    <option value="10" th:selected="${size == 10}">10</option>
+                                                    <option value="20" th:selected="${size == 20}">20</option>
+                                                    <option value="50" th:selected="${size == 50}">50</option>
+                                                </select>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin tổng quan -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">
+                                        Trang <strong th:text="${currentPage + 1}">1</strong> /
+                                        <strong th:text="${totalPages}">1</strong>
+                                    </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bảng danh sách nhân viên -->
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>
+                                                <a th:href="@{/employees(page=${currentPage}, size=${size}, sortBy='id', sortDir=${sortBy == 'id' and sortDir == 'asc' ? 'desc' : 'asc'}, phoneNumber=${phoneNumber})}"
+                                                   class="text-white text-decoration-none">
+                                                    ID
+                                                    <i th:if="${sortBy == 'id'}"
+                                                       th:class="${sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}"></i>
+                                                    <i th:unless="${sortBy == 'id'}" class="fas fa-sort"></i>
+                                                </a>
+                                            </th>
+                                            <th>
+                                                <a th:href="@{/employees(page=${currentPage}, size=${size}, sortBy='name', sortDir=${sortBy == 'name' and sortDir == 'asc' ? 'desc' : 'asc'}, phoneNumber=${phoneNumber})}"
+                                                   class="text-white text-decoration-none">
+                                                    Họ tên
+                                                    <i th:if="${sortBy == 'name'}"
+                                                       th:class="${sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}"></i>
+                                                    <i th:unless="${sortBy == 'name'}" class="fas fa-sort"></i>
+                                                </a>
+                                            </th>
+                                            <th>Email</th>
+                                            <th>Số điện thoại</th>
+                                            <th>
+                                                <a th:href="@{/employees(page=${currentPage}, size=${size}, sortBy='salary', sortDir=${sortBy == 'salary' and sortDir == 'asc' ? 'desc' : 'asc'}, phoneNumber=${phoneNumber})}"
+                                                   class="text-white text-decoration-none">
+                                                    Lương
+                                                    <i th:if="${sortBy == 'salary'}"
+                                                       th:class="${sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}"></i>
+                                                    <i th:unless="${sortBy == 'salary'}" class="fas fa-sort"></i>
+                                                </a>
+                                            </th>
+                                            <th>
+                                                <a th:href="@{/employees(page=${currentPage}, size=${size}, sortBy='createdAt', sortDir=${sortBy == 'createdAt' and sortDir == 'asc' ? 'desc' : 'asc'}, phoneNumber=${phoneNumber})}"
+                                                   class="text-white text-decoration-none">
+                                                    Ngày tạo
+                                                    <i th:if="${sortBy == 'createdAt'}"
+                                                       th:class="${sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}"></i>
+                                                    <i th:unless="${sortBy == 'createdAt'}" class="fas fa-sort"></i>
+                                                </a>
+                                            </th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:if="${employees.isEmpty()}">
+                                            <td colspan="7" class="text-center text-muted py-4">
+                                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                                <br>Không có nhân viên nào
+                                            </td>
+                                        </tr>
+                                        <tr th:each="employee : ${employees}">
+                                            <td th:text="${employee.id}">1</td>
+                                            <td th:text="${employee.name}">Nguyễn Văn A</td>
+                                            <td th:text="${employee.email}">email@example.com</td>
+                                            <td th:text="${employee.phoneNumber}">0123456789</td>
+                                            <td th:text="${#numbers.formatDecimal(employee.salary, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">15,000,000 VNĐ</td>
+                                            <td th:text="${#temporals.format(employee.createdAt, 'dd/MM/yyyy')}">01/01/2024</td>
+                                            <td>
+                                                <a th:href="@{/employees/{id}(id=${employee.id})}"
+                                                   class="btn btn-sm btn-info me-1" title="Xem chi tiết">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a th:href="@{/employees/{id}/edit(id=${employee.id})}"
+                                                   class="btn btn-sm btn-warning me-1" title="Sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a th:href="@{/employees/{id}/delete(id=${employee.id})}"
+                                                   class="btn btn-sm btn-danger" title="Xóa"
+                                                   onclick="return confirm('Bạn có chắc chắn muốn xóa nhân viên này?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Phân trang -->
+                            <div th:if="${totalPages > 1}" class="row">
+                                <div class="col-12">
+                                    <nav aria-label="Phân trang nhân viên">
+                                        <ul class="pagination justify-content-center">
+                                            <!-- Nút Previous -->
+                                            <li th:class="${currentPage == 0} ? 'page-item disabled' : 'page-item'">
+                                                <a th:if="${currentPage > 0}"
+                                                   th:href="@{/employees(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, phoneNumber=${phoneNumber})}"
+                                                   class="page-link">
+                                                    <i class="fas fa-chevron-left"></i> Trước
+                                                </a>
+                                                <span th:unless="${currentPage > 0}" class="page-link">
+                                                <i class="fas fa-chevron-left"></i> Trước
+                                            </span>
+                                            </li>
+
+                                            <!-- Các số trang -->
+                                            <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                                                th:class="${pageNum == currentPage} ? 'page-item active' : 'page-item'"
+                                                th:if="${pageNum >= currentPage - 2 and pageNum <= currentPage + 2}">
+                                                <a th:if="${pageNum != currentPage}"
+                                                   th:href="@{/employees(page=${pageNum}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, phoneNumber=${phoneNumber})}"
+                                                   class="page-link" th:text="${pageNum + 1}">1</a>
+                                                <span th:if="${pageNum == currentPage}" class="page-link" th:text="${pageNum + 1}">1</span>
+                                            </li>
+
+                                            <!-- Nút Next -->
+                                            <li th:class="${currentPage + 1 >= totalPages} ? 'page-item disabled' : 'page-item'">
+                                                <a th:if="${currentPage + 1 < totalPages}"
+                                                   th:href="@{/employees(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, phoneNumber=${phoneNumber})}"
+                                                   class="page-link">
+                                                    Sau <i class="fas fa-chevron-right"></i>
+                                                </a>
+                                                <span th:unless="${currentPage + 1 < totalPages}" class="page-link">
+                                                Sau <i class="fas fa-chevron-right"></i>
+                                            </span>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+                integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+                crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+                integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+                crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+                integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+                crossorigin="anonymous"></script>
+    </body>
+</html>
