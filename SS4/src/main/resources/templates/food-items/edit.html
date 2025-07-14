@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::div.content})}">
+<head>
+    <title>Chỉnh sửa Thực phẩm</title>
+</head>
+<body>
+<div class="content">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>Chỉnh sửa Thực phẩm: <span th:text="${foodItem.name}"></span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/food-items/edit/{id}(id=${foodItem.id})}" th:object="${foodItem}" method="post">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">
+                                        <i class="fas fa-tag me-1"></i>Tên thực phẩm <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control"
+                                           th:field="*{name}"
+                                           th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
+                                           placeholder="Nhập tên thực phẩm...">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">
+                                        <i class="fas fa-list me-1"></i>Danh mục <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select"
+                                            th:field="*{category}"
+                                            th:classappend="${#fields.hasErrors('category')} ? 'is-invalid'">
+                                        <option value="">-- Chọn danh mục --</option>
+                                        <option th:each="category : ${categories}"
+                                                th:value="${category.id}"
+                                                th:text="${category.categoryName}">
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">
+                                        <i class="fas fa-dollar-sign me-1"></i>Giá (VND) <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" class="form-control"
+                                           th:field="*{price}"
+                                           th:classappend="${#fields.hasErrors('price')} ? 'is-invalid'"
+                                           step="1000" min="0" placeholder="0">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="quantity" class="form-label">
+                                        <i class="fas fa-boxes me-1"></i>Số lượng
+                                    </label>
+                                    <input type="number" class="form-control"
+                                           th:field="*{quantity}"
+                                           min="0" placeholder="0">
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="expirationDate" class="form-label">
+                                        <i class="fas fa-calendar me-1"></i>Ngày hết hạn <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="date" class="form-control"
+                                           th:field="*{expirationDate}"
+                                           th:classappend="${#fields.hasErrors('expirationDate')} ? 'is-invalid'">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('expirationDate')}" th:errors="*{expirationDate}"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">
+                                <i class="fas fa-align-left me-1"></i>Mô tả
+                            </label>
+                            <textarea class="form-control" th:field="*{description}"
+                                      rows="3" placeholder="Nhập mô tả chi tiết về thực phẩm..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="status" class="form-label">
+                                <i class="fas fa-info-circle me-1"></i>Trạng thái
+                            </label>
+                            <select class="form-select" th:field="*{status}">
+                                <option th:each="status : ${statuses}"
+                                        th:value="${status}"
+                                        th:text="${status.displayName}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a th:href="@{/food-items}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times me-1"></i>Hủy
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Cập nhật
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

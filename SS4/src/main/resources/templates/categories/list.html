@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Quản lý Danh mục</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/food-items">
+            <i class="fas fa-utensils me-2"></i>Quản lý Thực phẩm
+        </a>
+        <div class="navbar-nav">
+            <a class="nav-link" href="/food-items">
+                <i class="fas fa-list me-1"></i>Danh sách thực phẩm
+            </a>
+            <a class="nav-link" href="/categories">
+                <i class="fas fa-tags me-1"></i>Danh mục
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-tags me-2"></i>Quản lý Danh mục
+            </h3>
+        </div>
+        <div class="card-body">
+            <!-- Thông báo -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Form tìm kiếm -->
+            <form th:action="@{/categories}" method="get" class="mb-4">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" name="name"
+                               th:value="${searchName}" placeholder="Tìm kiếm danh mục...">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-1"></i>Tìm kiếm
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <a th:href="@{/categories/add}" class="btn btn-success">
+                            <i class="fas fa-plus me-1"></i>Thêm mới
+                        </a>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Bảng danh sách -->
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên danh mục</th>
+                        <th>Mô tả</th>
+                        <th>Số lượng thực phẩm</th>
+                        <th>Thao tác</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="category : ${categories.content}">
+                        <td th:text="${category.id}"></td>
+                        <td>
+                            <strong th:text="${category.categoryName}"></strong>
+                        </td>
+                        <td th:text="${category.description}"></td>
+                        <td>
+                            <span class="badge bg-info" th:text="${category.foodItems != null ? category.foodItems.size() : 0}"></span>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a th:href="@{/categories/edit/{id}(id=${category.id})}"
+                                   class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger"
+                                        th:onclick="'confirmDelete(' + ${category.id} + ', \'' + ${category.categoryName} + '\')'">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Thông báo khi không có dữ liệu -->
+            <div th:if="${categories.content.isEmpty()}" class="text-center py-4">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Không tìm thấy danh mục nào</h5>
+                <a th:href="@{/categories/add}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Thêm danh mục mới
+                </a>
+            </div>
+
+            <!-- Phân trang -->
+            <nav th:if="${totalPages > 1}">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/categories(page=${currentPage - 1}, name=${searchName})}">
+                            <i class="fas fa-chevron-left"></i> Trước
+                        </a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/categories(page=${i}, name=${searchName})}"
+                           th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/categories(page=${currentPage + 1}, name=${searchName})}">
+                            Sau <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận xóa -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa danh mục <strong id="categoryName"></strong>?</p>
+                <p class="text-danger"><small>Hành động này có thể ảnh hưởng đến các thực phẩm trong danh mục!</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function confirmDelete(id, name) {
+        document.getElementById('categoryName').textContent = name;
+        document.getElementById('deleteForm').action = '/categories/delete/' + id;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+</script>
+</body>
+</html>
