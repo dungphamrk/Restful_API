@@ -50,16 +50,16 @@ public class OrderService {
             order.setCustomer(customer);
             order.setEmployee(employee);
             order.setCreatedAt(LocalDateTime.now());
+            final double[] totalMoney = {0.0};
 
-            // Calculate total money and validate order details
-            double totalMoney = 0.0;
             List<OrderDetail> orderDetails = orderDTO.getOrderDetails().stream().map(detailDTO -> {
                 Dish dish = dishRepository.findById(detailDTO.getDishId())
                         .orElseThrow(() -> new NoSuchElementException("Dish not found with id: " + detailDTO.getDishId()));
                 if (detailDTO.getQuantity() <= 0) {
                     throw new IllegalArgumentException("Quantity must be greater than 0 for dish id: " + detailDTO.getDishId());
                 }
-                totalMoney += dish.getPrice() * detailDTO.getQuantity();
+                totalMoney[0] += dish.getPrice() * detailDTO.getQuantity();
+
                 OrderDetail orderDetail = new OrderDetail();
                 orderDetail.setOrder(order);
                 orderDetail.setDish(dish);
@@ -68,7 +68,8 @@ public class OrderService {
                 return orderDetail;
             }).collect(Collectors.toList());
 
-            order.setTotalMoney(totalMoney);
+            order.setTotalMoney(totalMoney[0]);
+
             Order savedOrder = orderRepository.save(order);
 
             // Save order details
