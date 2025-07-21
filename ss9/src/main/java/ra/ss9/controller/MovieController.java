@@ -10,9 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/movies")
@@ -132,6 +136,78 @@ public class MovieController {
             return ResponseEntity.ok(movies);
         } catch (Exception e) {
             logger.error("Error getting movies: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/search-logs")
+    public ResponseEntity<Map<String, Long>> getSearchLogs() {
+        try {
+            Map<String, Long> searchCounts = new HashMap<>();
+            String logFilePath = "app.log";
+            Pattern pattern = Pattern.compile("Search keyword: ([^,]+),");
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(logFilePath))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Matcher matcher = pattern.matcher(line);
+                    if (matcher.find()) {
+                        String keyword = matcher.group(1).trim();
+                        searchCounts.merge(keyword, 1L, Long::sum);
+                    }
+                }
+            }
+
+            logger.info("Retrieved search logs, Total unique keywords: {}", searchCounts.size());
+            return ResponseEntity.ok(searchCounts);
+        } catch (Exception e) {
+            logger.error("Error retrieving search logs: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/suggestions")
+    public ResponseEntity<List<Movie>> getMovieSuggestions() {
+        try {
+            Map<String, Long> searchCounts = new HashMap<>();
+            String logFilePath = "app.log";
+            Pattern pattern = Pattern.compile("Search keyword: ([^,]+),");
+
+            // Read search keywords from log file
+            try (BufferedReader reader = new BufferedReader(new FileReader(logFilePath))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Matcher matcher = pattern.matcher(line);
+                    if (matcher.find()) {
+                        String keyword = matcher.group(1).trim();
+                        searchCounts.merge(keyword, 1L, Long::sum);
+                    }
+                }
+            }
+
+            // Get top 3 most searched keywords
+            List<String> topKeywords = searchCounts.entrySet().stream()
+                    .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                    .limit(3)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+
+            // Get movies matching top keywords
+            List<Movie> suggestions = new ArrayList<>();
+            for (String keyword : topKeywords) {
+                List<Movie> movies = movieService.searchMovies(keyword);
+                suggestions.addAll(movies);
+            }
+
+            // Remove duplicates while preserving order
+            suggestions = suggestions.stream()
+                    .distinct()
+                    .collect(Collectors.toList());
+
+            logger.info("Retrieved movie suggestions, Total suggestions: {}", suggestions.size());
+            return ResponseEntity.ok(suggestions);
+        } catch (Exception e) {
+            logger.error("Error retrieving movie suggestions: {}", e.getMessage(), e);
             return ResponseEntity.badRequest().build();
         }
     }
