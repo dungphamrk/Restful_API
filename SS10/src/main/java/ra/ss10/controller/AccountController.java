@@ -1,10 +1,10 @@
 package ra.ss10.controller;
 
-import com.data.ss10.model.entity.Account;
-import com.data.ss10.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ra.ss10.entity.model.Account;
+import ra.ss10.service.AccountService;
 
 import java.util.List;
 import java.util.UUID;

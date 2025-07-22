@@ -29,6 +29,6 @@ public class Transaction {
 
     private Double money;
     private String note;
-    private String status; // "thành công", "thất bại", "đang chờ xử lý"
+    private String status;
     private LocalDateTime createdAt;
 }

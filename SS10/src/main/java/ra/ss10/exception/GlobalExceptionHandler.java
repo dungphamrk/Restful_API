@@ -1,4 +1,4 @@
-package ra.ss10.exception;
+        package ra.ss10.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,12 +33,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<DataErrorResponse<String>> handleNoSuchElementException(NoSuchElementException ex) {
         logger.error("Resource not found: {}", ex.getMessage());
-        return new ResponseEntity<>(new DataErrorResponse<>("Resource not found", HttpStatus.NOT_FOUND, ex.getMessage()), HttpStatus.NOT_FOUND);
+        String message = ex.getMessage().contains("CCCD") ? "Tài khoản không tồn tại với CCCD đã cung cấp" :
+                ex.getMessage().contains("ID") ? "Tài khoản không tồn tại với ID đã cung cấp" :
+                        "Tài khoản không tồn tại";
+        return new ResponseEntity<>(new DataErrorResponse<>("Tài khoản không tìm thấy", HttpStatus.NOT_FOUND, message), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<DataErrorResponse<String>> handleGenericException(Exception ex) {
         logger.error("Unexpected error occurred: {}", ex.getMessage(), ex);
-        return new ResponseEntity<>(new DataErrorResponse<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred"), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new DataErrorResponse<>("Lỗi hệ thống", HttpStatus.INTERNAL_SERVER_ERROR, "Đã xảy ra lỗi không mong muốn"), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

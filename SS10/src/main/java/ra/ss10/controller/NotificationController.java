@@ -1,13 +1,13 @@
 package ra.ss10.controller;
 
-import com.data.ss10.model.entity.Notification;
-import com.data.ss10.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ra.ss10.entity.model.Notification;
+import ra.ss10.service.NotificationService;
 
 import java.util.List;
 import java.util.UUID;

@@ -1,13 +1,14 @@
 package ra.ss10.controller;
 
-import com.data.ss10.model.entity.Transaction;
-import com.data.ss10.service.TransactionService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ra.ss10.entity.model.Transaction;
+import ra.ss10.service.TransactionService;
 
 import java.util.UUID;
 
