@@ -4,7 +4,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'com.example'
+group = 'ra'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -25,11 +25,10 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -38,8 +37,10 @@ dependencies {
     implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
     // https://mvnrepository.com/artifact/com.cloudinary/cloudinary-http45
     implementation 'com.cloudinary:cloudinary-http45:1.39.0'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
-
+    // https://mvnrepository.com/artifact/org.modelmapper/modelmapper
+    implementation 'org.modelmapper:modelmapper:3.1.1'
 }
 
 tasks.named('test') {
