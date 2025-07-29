@@ -17,8 +17,8 @@ public class CustomUserDetails implements UserDetails {
     private String username;
     private String password;
     private String fullName;
-    private String address;
     private String email;
+    private String isLogin;
     private String phone;
     private Boolean status;
     private Collection<? extends GrantedAuthority> authorities ;

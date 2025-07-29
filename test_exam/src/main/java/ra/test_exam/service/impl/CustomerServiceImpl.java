@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -57,6 +58,16 @@ public class CustomerServiceImpl implements CustomerService {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         String token = jwtProvider.generateToken(userDetails.getUsername());
 
+        Customer customer = Customer.builder()
+                .username(userDetails.getUsername())
+                .password(userDetails.getPassword())
+                .fullName(userDetails.getFullName())
+                .email(userDetails.getEmail())
+                .phone(userDetails.getPhone())
+                .status(true)
+                .isLogin(true)
+                .build();
+        customerRepository.save(customer);
         return JWTResponse.builder()
                 .username(userDetails.getUsername())
                 .fullName(userDetails.getFullName())
@@ -69,8 +80,20 @@ public class CustomerServiceImpl implements CustomerService {
                 .build();
     }
 
+
     @Override
-    public JWTResponse logout() {
+    public JWTResponse logout(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+
+        Customer customer = Customer.builder()
+                .username(customUserDetails.getUsername())
+                .password(customUserDetails.getPassword())
+                .fullName(customUserDetails.getFullName())
+                .email(customUserDetails.getEmail())
+                .phone(customUserDetails.getPhone())
+                .status(true)
+                .isLogin(false)
+                .build();
+        customerRepository.save(customer);
         return JWTResponse.builder()
                 .isLogin(false)
                 .token(null)
