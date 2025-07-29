@@ -6,7 +6,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -48,26 +47,24 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public JWTResponse login(CustomerLogin userLogin) {
-        Authentication authentication = null;
-        try{
-            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLogin.getUsername(),userLogin.getPassword()));
-        }catch(AuthenticationException e){
-            log.error("Sai username hoac password!");
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(userLogin.getUsername(), userLogin.getPassword())
+            );
+        } catch (AuthenticationException e) {
+            log.error("Sai username hoặc password!");
+            throw new RuntimeException("Invalid username or password");
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         String token = jwtProvider.generateToken(userDetails.getUsername());
 
-        Customer customer = Customer.builder()
-                .username(userDetails.getUsername())
-                .password(userDetails.getPassword())
-                .fullName(userDetails.getFullName())
-                .email(userDetails.getEmail())
-                .phone(userDetails.getPhone())
-                .status(true)
-                .isLogin(true)
-                .build();
+        Customer customer = customerRepository.findCustomerByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        customer.setIsLogin(true);
         customerRepository.save(customer);
+
         return JWTResponse.builder()
                 .username(userDetails.getUsername())
                 .fullName(userDetails.getFullName())
@@ -80,20 +77,14 @@ public class CustomerServiceImpl implements CustomerService {
                 .build();
     }
 
-
     @Override
-    public JWTResponse logout(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public JWTResponse logout(CustomUserDetails customUserDetails) {
+        Customer customer = customerRepository.findCustomerByUsername(customUserDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Customer customer = Customer.builder()
-                .username(customUserDetails.getUsername())
-                .password(customUserDetails.getPassword())
-                .fullName(customUserDetails.getFullName())
-                .email(customUserDetails.getEmail())
-                .phone(customUserDetails.getPhone())
-                .status(true)
-                .isLogin(false)
-                .build();
+        customer.setIsLogin(false);
         customerRepository.save(customer);
+
         return JWTResponse.builder()
                 .isLogin(false)
                 .token(null)

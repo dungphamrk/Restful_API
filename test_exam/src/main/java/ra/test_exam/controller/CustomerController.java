@@ -3,6 +3,7 @@ package ra.test_exam.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,8 +13,8 @@ import ra.test_exam.model.dto.request.CustomerPrincipal;
 import ra.test_exam.model.dto.response.APIResponse;
 import ra.test_exam.model.dto.response.JWTResponse;
 import ra.test_exam.model.entity.Customer;
+import ra.test_exam.sercurity.principal.CustomUserDetails;
 import ra.test_exam.service.CustomerService;
-
 
 @RestController
 @RequestMapping("/api/v1/customers")
@@ -22,20 +23,29 @@ public class CustomerController {
     private CustomerService customerService;
 
     @PostMapping("/register")
-    public ResponseEntity<APIResponse<Customer>> registerUser(@RequestBody CustomerPrincipal customerPrincipal){
-        return new ResponseEntity<>(new APIResponse<>(true,"Register customer successfully!",customerService.registerCustomer(customerPrincipal), HttpStatus.CREATED), HttpStatus.CREATED);
+    public ResponseEntity<APIResponse<Customer>> registerUser(@RequestBody CustomerPrincipal customerPrincipal) {
+        return new ResponseEntity<>(
+                new APIResponse<>(true, "Register customer successfully!",
+                        customerService.registerCustomer(customerPrincipal), HttpStatus.CREATED),
+                HttpStatus.CREATED
+        );
     }
 
     @PostMapping("/login")
-    public ResponseEntity<APIResponse<JWTResponse>> login(@RequestBody CustomerLogin userLogin){
-        return new ResponseEntity<>(new APIResponse<>(true,"Login successfully!",customerService.login(userLogin), HttpStatus.OK),HttpStatus.OK);
+    public ResponseEntity<APIResponse<JWTResponse>> login(@RequestBody CustomerLogin userLogin) {
+        return new ResponseEntity<>(
+                new APIResponse<>(true, "Login successfully!",
+                        customerService.login(userLogin), HttpStatus.OK),
+                HttpStatus.OK
+        );
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<APIResponse> logout() {
-        JWTResponse response = customerService.logout();
-        return new ResponseEntity<>(new APIResponse<>(true,"Logout successfully!",response, HttpStatus.OK),HttpStatus.OK);
-
+    public ResponseEntity<APIResponse<JWTResponse>> logout(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        JWTResponse response = customerService.logout(userDetails);
+        return new ResponseEntity<>(
+                new APIResponse<>(true, "Logout successfully!", response, HttpStatus.OK),
+                HttpStatus.OK
+        );
     }
-
 }
