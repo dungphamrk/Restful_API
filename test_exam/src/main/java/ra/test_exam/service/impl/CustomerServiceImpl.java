@@ -86,7 +86,7 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.save(customer);
 
         return JWTResponse.builder()
-                .isLogin(false)
+                .isLogin(false) 
                 .token(null)
                 .username(null)
                 .fullName(null)
